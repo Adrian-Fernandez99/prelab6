@@ -20,12 +20,8 @@ uso de dos potenciometros ditstintos.
 void setup();
 void ADC_init();
 void UART_init();
-void write_char(char caracter);
+void write_char(uint8_t direct, char caracter);
 void write_str(char* texto);
-
-uint16_t ADC_read(uint8_t PIN);
-
-uint16_t ADC_in = 0;
 
 // MAIN LOOP
 int main(void)
@@ -34,7 +30,6 @@ int main(void)
 	sei();
 	while (1)
 	{	
-		ADC_in = ADC_read(5);
 	}
 }
 
@@ -50,8 +45,16 @@ void setup()
 }
 void ADC_init()
 {
-	ADMUX = (1 << REFS0);  // 5V de referencia
-	ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1);  // prescaler = 64
+	ADMUX = 0;
+	ADMUX	|= (1 << REFS0);
+	ADMUX	|= (1 << ADLAR);
+	
+	ADCSRA	= 0;
+	ADCSRA	|= (1 << ADPS1) | (1 << ADPS0);
+	ADCSRA	|= (1 << ADIE);
+	ADCSRA	|= (1 << ADEN);
+	
+	ADCSRA	|= (1 << ADSC);
 }
 
 void UART_init()
@@ -65,20 +68,19 @@ void UART_init()
 	UBRR0 = 103;	// BAUD RATE a 9600
 }
 
-uint16_t ADC_read(uint8_t PIN)
-{
-	ADMUX = (ADMUX & 0xF0) | (PIN & 0x0F);   // Selecciona canal (0–7)
-	ADCSRA |= (1 << ADSC);                   // Inicia conversión
-	while (ADCSRA & (1 << ADSC));            // Espera a que termine
-	return ADC;                              // Devuelve valor (10 bits)
-}
-
-void write_char(char caracter)
+void write_char(uint8_t direct, char caracter)
 {
 	while ((UCSR0A & (1 << UDRE0)) == 0);
-	PORTB = caracter;
+	if (direct == 0)
+	{
+		PORTB = caracter;
+	}
+	if (direct == 1)
+	{
+		UDR0 = caracter;
+	}
 }
-
+/*
 void write_str(char* texto)
 {
 	for(uint8_t i = 0; *(texto+i) != "\0"; i++)
@@ -86,11 +88,18 @@ void write_str(char* texto)
 		write_char(*(texto+i));
 	}
 }
-
+*/
 
 // Interrupt routines
 ISR(USART_RX_vect)
 {
 	char temporal = UDR0;
-	write_char(temporal);
+	write_char(0, temporal);
+}
+
+ISR(ADC_vect)
+{
+	char ingreso = ADCH;
+	write_char(1, ingreso);
+	ADCSRA	|= (1 << ADSC);
 }

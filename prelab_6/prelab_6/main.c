@@ -76,7 +76,7 @@ uint16_t ADC_read(uint8_t PIN)
 void write_char(char caracter)
 {
 	while ((UCSR0A & (1 << UDRE0)) == 0);
-	UDR0 = caracter;
+	PORTB = caracter;
 }
 
 void write_str(char* texto)
@@ -92,5 +92,5 @@ void write_str(char* texto)
 ISR(USART_RX_vect)
 {
 	char temporal = UDR0;
-	PORTB = temporal;
+	write_char(temporal);
 }

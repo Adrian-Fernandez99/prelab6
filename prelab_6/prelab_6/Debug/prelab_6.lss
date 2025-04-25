@@ -3,31 +3,31 @@ prelab_6.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000000  00800100  00800100  000001ca  2**0
+  0 .data         00000000  00800100  00800100  00000204  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         00000156  00000000  00000000  00000074  2**1
+  1 .text         00000190  00000000  00000000  00000074  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          00000002  00800100  00800100  000001ca  2**0
+  2 .bss          00000002  00800100  00800100  00000204  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  000001ca  2**0
+  3 .comment      00000030  00000000  00000000  00000204  2**0
                   CONTENTS, READONLY
-  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  000001fc  2**2
+  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  00000234  2**2
                   CONTENTS, READONLY
-  5 .debug_aranges 00000058  00000000  00000000  0000023c  2**0
+  5 .debug_aranges 00000058  00000000  00000000  00000274  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   000007e3  00000000  00000000  00000294  2**0
+  6 .debug_info   000007ec  00000000  00000000  000002cc  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 00000708  00000000  00000000  00000a77  2**0
+  7 .debug_abbrev 00000708  00000000  00000000  00000ab8  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   00000317  00000000  00000000  0000117f  2**0
+  8 .debug_line   00000317  00000000  00000000  000011c0  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  000000b4  00000000  00000000  00001498  2**2
+  9 .debug_frame  000000ec  00000000  00000000  000014d8  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    000003cf  00000000  00000000  0000154c  2**0
+ 10 .debug_str    000003cf  00000000  00000000  000015c4  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    0000010d  00000000  00000000  0000191b  2**0
+ 11 .debug_loc    00000190  00000000  00000000  00001993  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000048  00000000  00000000  00001a28  2**0
+ 12 .debug_ranges 00000048  00000000  00000000  00001b23  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -51,7 +51,7 @@ Disassembly of section .text:
   3c:	0c 94 51 00 	jmp	0xa2	; 0xa2 <__bad_interrupt>
   40:	0c 94 51 00 	jmp	0xa2	; 0xa2 <__bad_interrupt>
   44:	0c 94 51 00 	jmp	0xa2	; 0xa2 <__bad_interrupt>
-  48:	0c 94 9a 00 	jmp	0x134	; 0x134 <__vector_18>
+  48:	0c 94 a0 00 	jmp	0x140	; 0x140 <__vector_18>
   4c:	0c 94 51 00 	jmp	0xa2	; 0xa2 <__bad_interrupt>
   50:	0c 94 51 00 	jmp	0xa2	; 0xa2 <__bad_interrupt>
   54:	0c 94 51 00 	jmp	0xa2	; 0xa2 <__bad_interrupt>
@@ -72,7 +72,7 @@ Disassembly of section .text:
   74:	11 e0       	ldi	r17, 0x01	; 1
   76:	a0 e0       	ldi	r26, 0x00	; 0
   78:	b1 e0       	ldi	r27, 0x01	; 1
-  7a:	e6 e5       	ldi	r30, 0x56	; 86
+  7a:	e0 e9       	ldi	r30, 0x90	; 144
   7c:	f1 e0       	ldi	r31, 0x01	; 1
   7e:	02 c0       	rjmp	.+4      	; 0x84 <__do_copy_data+0x10>
   80:	05 90       	lpm	r0, Z+
@@ -95,7 +95,7 @@ Disassembly of section .text:
   96:	b2 07       	cpc	r27, r18
   98:	e1 f7       	brne	.-8      	; 0x92 <.do_clear_bss_loop>
   9a:	0e 94 8f 00 	call	0x11e	; 0x11e <main>
-  9e:	0c 94 a9 00 	jmp	0x152	; 0x152 <_exit>
+  9e:	0c 94 c6 00 	jmp	0x18c	; 0x18c <_exit>
 
 000000a2 <__bad_interrupt>:
   a2:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
@@ -172,31 +172,60 @@ Disassembly of section .text:
  12e:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <__DATA_REGION_ORIGIN__>
  132:	f8 cf       	rjmp	.-16     	; 0x124 <main+0x6>
 
-00000134 <__vector_18>:
+00000134 <write_char>:
+ 134:	90 91 c0 00 	lds	r25, 0x00C0	; 0x8000c0 <__TEXT_REGION_LENGTH__+0x7f80c0>
+ 138:	95 ff       	sbrs	r25, 5
+ 13a:	fc cf       	rjmp	.-8      	; 0x134 <write_char>
+ 13c:	85 b9       	out	0x05, r24	; 5
+ 13e:	08 95       	ret
+
+00000140 <__vector_18>:
 
 
 // Interrupt routines
 ISR(USART_RX_vect)
 {
- 134:	1f 92       	push	r1
- 136:	0f 92       	push	r0
- 138:	0f b6       	in	r0, 0x3f	; 63
- 13a:	0f 92       	push	r0
- 13c:	11 24       	eor	r1, r1
- 13e:	8f 93       	push	r24
+ 140:	1f 92       	push	r1
+ 142:	0f 92       	push	r0
+ 144:	0f b6       	in	r0, 0x3f	; 63
+ 146:	0f 92       	push	r0
+ 148:	11 24       	eor	r1, r1
+ 14a:	2f 93       	push	r18
+ 14c:	3f 93       	push	r19
+ 14e:	4f 93       	push	r20
+ 150:	5f 93       	push	r21
+ 152:	6f 93       	push	r22
+ 154:	7f 93       	push	r23
+ 156:	8f 93       	push	r24
+ 158:	9f 93       	push	r25
+ 15a:	af 93       	push	r26
+ 15c:	bf 93       	push	r27
+ 15e:	ef 93       	push	r30
+ 160:	ff 93       	push	r31
 	char temporal = UDR0;
- 140:	80 91 c6 00 	lds	r24, 0x00C6	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7f80c6>
-	PORTB = temporal;
- 144:	85 b9       	out	0x05, r24	; 5
- 146:	8f 91       	pop	r24
- 148:	0f 90       	pop	r0
- 14a:	0f be       	out	0x3f, r0	; 63
- 14c:	0f 90       	pop	r0
- 14e:	1f 90       	pop	r1
- 150:	18 95       	reti
+ 162:	80 91 c6 00 	lds	r24, 0x00C6	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7f80c6>
+	write_char(temporal);
+ 166:	0e 94 9a 00 	call	0x134	; 0x134 <write_char>
+ 16a:	ff 91       	pop	r31
+ 16c:	ef 91       	pop	r30
+ 16e:	bf 91       	pop	r27
+ 170:	af 91       	pop	r26
+ 172:	9f 91       	pop	r25
+ 174:	8f 91       	pop	r24
+ 176:	7f 91       	pop	r23
+ 178:	6f 91       	pop	r22
+ 17a:	5f 91       	pop	r21
+ 17c:	4f 91       	pop	r20
+ 17e:	3f 91       	pop	r19
+ 180:	2f 91       	pop	r18
+ 182:	0f 90       	pop	r0
+ 184:	0f be       	out	0x3f, r0	; 63
+ 186:	0f 90       	pop	r0
+ 188:	1f 90       	pop	r1
+ 18a:	18 95       	reti
 
-00000152 <_exit>:
- 152:	f8 94       	cli
+0000018c <_exit>:
+ 18c:	f8 94       	cli
 
-00000154 <__stop_program>:
- 154:	ff cf       	rjmp	.-2      	; 0x154 <__stop_program>
+0000018e <__stop_program>:
+ 18e:	ff cf       	rjmp	.-2      	; 0x18e <__stop_program>

@@ -27,10 +27,9 @@ uint16_t ADC_read(uint8_t PIN);
 int main(void)
 {
 	setup();
+	sei();
 	while (1)
-	{
-		sei();
-		
+	{	
 	}
 }
 
@@ -39,6 +38,7 @@ int main(void)
 void setup()
 {
 	cli();
+	DDRB = 0xFF
 	ADC_init();
 	UART_init();
 	sei();
@@ -68,4 +68,23 @@ uint16_t ADC_read(uint8_t PIN)
 	return ADC;                              // Devuelve valor (10 bits)
 }
 
+void write_char(char caracter)
+{
+	while ((UCSR0A & (1 << UDRE0)) == 0);
+	UDRE0 = caracter;
+}
+
+void write_str(char* texto)
+{
+	for(uint8_t i = 0; *(texto+i) != "\0"; i++)
+	{
+		write_char();
+	}
+}
+
 // Interrupt routines
+ISR(USART_RX_vect)
+{
+	char temporal = UDRE0;
+	write_char(temporal);
+}

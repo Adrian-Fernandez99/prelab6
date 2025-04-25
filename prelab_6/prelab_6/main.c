@@ -20,8 +20,12 @@ uso de dos potenciometros ditstintos.
 void setup();
 void ADC_init();
 void UART_init();
+void write_char(char caracter);
+void write_str(char* texto);
 
 uint16_t ADC_read(uint8_t PIN);
+
+uint16_t ADC_in = 0;
 
 // MAIN LOOP
 int main(void)
@@ -30,6 +34,7 @@ int main(void)
 	sei();
 	while (1)
 	{	
+		ADC_in = ADC_read(5);
 	}
 }
 
@@ -38,7 +43,7 @@ int main(void)
 void setup()
 {
 	cli();
-	DDRB = 0xFF
+	DDRB = 0xFF; 
 	ADC_init();
 	UART_init();
 	sei();
@@ -71,20 +76,21 @@ uint16_t ADC_read(uint8_t PIN)
 void write_char(char caracter)
 {
 	while ((UCSR0A & (1 << UDRE0)) == 0);
-	UDRE0 = caracter;
+	UDR0 = caracter;
 }
 
 void write_str(char* texto)
 {
 	for(uint8_t i = 0; *(texto+i) != "\0"; i++)
 	{
-		write_char();
+		write_char(*(texto+i));
 	}
 }
+
 
 // Interrupt routines
 ISR(USART_RX_vect)
 {
-	char temporal = UDRE0;
-	write_char(temporal);
+	char temporal = UDR0;
+	PORTB = temporal;
 }

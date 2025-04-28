@@ -18,9 +18,8 @@ uso de dos potenciometros ditstintos.
 
 // Prototipos de función
 void setup();
-void ADC_init();
 void UART_init();
-void write_char(uint8_t direct, char caracter);
+void write_char(char caracter);
 void write_str(char* texto);
 
 // MAIN LOOP
@@ -28,6 +27,7 @@ int main(void)
 {
 	setup();
 	sei();
+	write_str("Tralalero tralala");
 	while (1)
 	{	
 	}
@@ -39,22 +39,8 @@ void setup()
 {
 	cli();
 	DDRB = 0xFF; 
-	ADC_init();
 	UART_init();
 	sei();
-}
-void ADC_init()
-{
-	ADMUX = 0;
-	ADMUX	|= (1 << REFS0);
-	ADMUX	|= (1 << ADLAR);
-	
-	ADCSRA	= 0;
-	ADCSRA	|= (1 << ADPS1) | (1 << ADPS0);
-	ADCSRA	|= (1 << ADIE);
-	ADCSRA	|= (1 << ADEN);
-	
-	ADCSRA	|= (1 << ADSC);
 }
 
 void UART_init()
@@ -68,38 +54,23 @@ void UART_init()
 	UBRR0 = 103;	// BAUD RATE a 9600
 }
 
-void write_char(uint8_t direct, char caracter)
+void write_char(char caracter)
 {
 	while ((UCSR0A & (1 << UDRE0)) == 0);
-	if (direct == 0)
-	{
-		PORTB = caracter;
-	}
-	if (direct == 1)
-	{
-		UDR0 = caracter;
-	}
+	UDR0 = caracter;
 }
-/*
+
 void write_str(char* texto)
 {
-	for(uint8_t i = 0; *(texto+i) != "\0"; i++)
+	for(uint8_t i = 0; *(texto+i) != 'ÿ'; i++)
 	{
 		write_char(*(texto+i));
 	}
 }
-*/
 
 // Interrupt routines
 ISR(USART_RX_vect)
 {
 	char temporal = UDR0;
-	write_char(0, temporal);
-}
-
-ISR(ADC_vect)
-{
-	char ingreso = ADCH;
-	write_char(1, ingreso);
-	ADCSRA	|= (1 << ADSC);
+	write_str(&temporal);
 }
